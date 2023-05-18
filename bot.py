@@ -51,7 +51,7 @@ async def add_location(ctx, building, number):
   }
   channel = await ctx.guild.create_text_channel(f'{location}', overwrites=overwrites,
                                                 category=category)
-  role = await ctx.guild.create_role(name=location, colour=random.randint(0, 0xFFFFFF))
+  role = await ctx.guild.create_role(name=location, colour=random.randint(0, 0xFFFFFF), hoist=True)
   await channel.set_permissions(role, read_messages=True, send_messages=True)
   await ctx.author.add_roles(role, reason='/tag-location command')
 
