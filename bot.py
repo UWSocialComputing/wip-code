@@ -15,6 +15,8 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 BUILDINGS = ['test', 'cse1', 'cse2', 'ode']
 
+STUDY_LOCATIONS = {'test 123': [3, 4], 'cse1 111': [2, 4], 'cse2 20': [1, 1], 'ode 333': [5, 5]} # hardcoded data
+
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
@@ -96,5 +98,32 @@ async def tag_location(ctx, building, number):
 async def tag_location_error(ctx, error):
   await ctx.channel.send(f'Usage: `/tag-location building number` where `building` is a building '
                          f'code and `number` is the room number.')
+
+
+@client.command(name='list-info',
+                help='Lists noise and busy-ness levels of all study locations',
+                brief='Lists noise and busy-ness levels of all study locations')
+async def list_info(ctx):
+    info_table = '| Location | Noise | Busy-ness |\n' \
+                 + '|----------|-------|-----------|\n'
+
+    for location in STUDY_LOCATIONS:
+        location_string = location
+        location_length = len(location_string)
+        noise_level = str(STUDY_LOCATIONS[location][0])
+        busyness_level = str(STUDY_LOCATIONS[location][1])
+
+        # Add padding to location string
+        while location_length < 8:
+            location_string += ' '
+            location_length += 1
+
+        info_table += ('| ' + location_string + ' |   ' + noise_level
+                       + '   |     ' + busyness_level + '     |\n')
+
+    await ctx.channel.send(f'Noise and Busy-ness Levels for each study location, '
+                           f'on a scale of 1 (lowest) to 5 (highest)\n`{info_table}`')
+
+    return
 
 client.run(TOKEN)
