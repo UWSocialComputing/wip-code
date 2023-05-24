@@ -152,7 +152,7 @@ async def list_info(ctx):
                        + '   |     ' + busyness_level + '     |\n')
 
     await ctx.channel.send(f'Noise and Busy-ness Levels for each study location, '
-                           f'on a scale of 1 (lowest) to 5 (highest)\n`{info_table}`')
+                           f'on a scale of 1 (lowest) to 5 (highest)\n```{info_table}```')
 
     return
 
