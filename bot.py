@@ -127,7 +127,7 @@ async def clear_role(ctx, building, number):
 
 @clear_role.error
 async def clear_role_error(ctx, error):
-  await ctx.channel.send('clear_role error')
+  await ctx.channel.send('clear_role error`')
 
 
 @client.command(name='list-info',
