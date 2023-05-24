@@ -100,6 +100,36 @@ async def tag_location_error(ctx, error):
                          f'code and `number` is the room number.')
 
 
+@client.command(name='clear-role',
+                 help='Removes a location role',
+                 brief='Removes a location role')
+async def clear_role(ctx, building, number):
+  print(building)
+  print(number)
+  location = f'{building.lower()}-{number}'
+  category = get(ctx.guild.categories, name='location-channels')
+  channel = get(category.text_channels, name=location)
+  if not channel:
+    await ctx.channel.send(f'Location \"{location}\" does not exist. Please use the '
+                           f'`/add-location` command to add that location.')
+  
+  # Check if user has the role
+  role = get(ctx.guild.roles, name=location)
+  if role not in ctx.author.roles:
+    await ctx.channel.send(f'You do not have the role for {location}!')
+    return
+  
+  # Remove the role from user
+  await ctx.author.remove_roles(role, reason='/clear-role command')
+  await ctx.channel.send(f'Location role for {location} removed!')
+  await channel.send(f'{ctx.author.name} has left!')
+
+
+@clear_role.error
+async def clear_role_error(ctx, error):
+  await ctx.channel.send('clear_role error')
+
+
 @client.command(name='list-info',
                 help='Lists noise and busy-ness levels of all study locations',
                 brief='Lists noise and busy-ness levels of all study locations')
