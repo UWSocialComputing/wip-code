@@ -156,4 +156,37 @@ async def list_info(ctx):
 
     return
 
+
+@client.command(name='list-people',
+                help=(f'Given a building code and room number, lists all people at that '
+                      f'location,\n'
+                      f'Usage: `/list-people building number` where `building` is a building '
+                      f'code and `number` is the room number.'),
+                brief='Lists people at a study location')
+async def list_people(ctx, building, number):
+    # validate building and number
+    location = f'{building.lower()}-{number}'
+    category = get(ctx.guild.categories, name='location-channels')
+    channel = get(category.text_channels, name=location)
+    if not channel:
+        await ctx.channel.send(f'Location \"{location}\" does not exist.')
+        return
+
+    # list users with the role building-number
+    people = f'People at location \"{location}\":\n'
+    role = get(ctx.guild.roles, name=location)
+    members = role.members
+    for member in members:
+        people += (member.name + '\n')
+
+    await ctx.channel.send(f'```{people}```')
+    return
+
+
+@list_people.error
+async def list_people_error(ctx, error):
+    await ctx.channel.send(f'Usage: `/list-people building number` where `building` is a building '
+                           f'code and `number` is the room number.')
+
+
 client.run(TOKEN)
