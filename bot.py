@@ -15,7 +15,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 BUILDINGS = ['test', 'cse1', 'cse2', 'ode']
 
-STUDY_LOCATIONS = {'test 123': [3, 4], 'cse1 111': [2, 4], 'cse2 20': [1, 1], 'ode 333': [5, 5]} # hardcoded data
+LOCATIONS = {'test 123': [3, 4], 'cse1 111': [2, 4], 'cse2 20': [1, 1], 'ode 333': [5, 5]} # hardcoded data
 
 @client.event
 async def on_ready():
@@ -38,9 +38,10 @@ async def add_location(ctx, building, number):
     return
 
   # check if the location channel exists already
-  location = f'{building}-{number}'
+  location = f'{building} {number}'
+  channel_name = f'{building}-{number}'
   category = get(ctx.guild.categories, name='location-channels')
-  channel = get(category.text_channels, name=location)
+  channel = get(category.text_channels, name=channel_name)
   if channel:
     await ctx.channel.send(f'Location \"{location}\" already exists. Please use the '
                            f'`/tag-location` command to tag yourself!')
@@ -51,12 +52,12 @@ async def add_location(ctx, building, number):
     ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
     ctx.guild.me: discord.PermissionOverwrite(read_messages=True)
   }
-  channel = await ctx.guild.create_text_channel(f'{location}', overwrites=overwrites,
+  channel = await ctx.guild.create_text_channel(f'{channel_name}', overwrites=overwrites,
                                                 category=category)
   role = await ctx.guild.create_role(name=location, colour=random.randint(0, 0xFFFFFF), hoist=True)
   await channel.set_permissions(role, read_messages=True, send_messages=True)
   await ctx.author.add_roles(role, reason='/tag-location command')
-
+  LOCATIONS[location] = ['X', 'X']
   await ctx.channel.send(f'Location {location} added!')
   await channel.send(f'Welcome <@{ctx.author.id}>!')
 
@@ -75,9 +76,10 @@ async def add_location_error(ctx, error):
                 brief='Gives you the role for a location')
 async def tag_location(ctx, building, number):
   # validate building and number
-  location = f'{building.lower()}-{number}'
+  location = f'{building.lower()} {number}'
+  channel_name = f'{building.lower()}-{number}'
   category = get(ctx.guild.categories, name='location-channels')
-  channel = get(category.text_channels, name=location)
+  channel = get(category.text_channels, name=channel_name)
   if not channel:
     await ctx.channel.send(f'Location \"{location}\" does not exist. Please use the '
                            f'`/add-location` command to add that location.')
@@ -104,11 +106,10 @@ async def tag_location_error(ctx, error):
                  help='Removes a location role',
                  brief='Removes a location role')
 async def clear_role(ctx, building, number):
-  print(building)
-  print(number)
-  location = f'{building.lower()}-{number}'
+  location = f'{building.lower()} {number}'
+  channel_name = f'{building.lower()}-{number}'
   category = get(ctx.guild.categories, name='location-channels')
-  channel = get(category.text_channels, name=location)
+  channel = get(category.text_channels, name=channel_name)
   if not channel:
     await ctx.channel.send(f'Location \"{location}\" does not exist. Please use the '
                            f'`/add-location` command to add that location.')
@@ -130,6 +131,38 @@ async def clear_role_error(ctx, error):
   await ctx.channel.send('clear_role error`')
 
 
+@client.command(name='update-noise')
+async def update_noise(ctx, building, number, val):
+  # check if the location exists
+  location = f'{building.lower()} {number}'
+  if location not in LOCATIONS:
+    await ctx.channel.send(f'Location {location} not found!')
+
+  # update the location's noise level
+  LOCATIONS[location] = [val, LOCATIONS[location][1]]
+
+
+@update_noise.error
+async def update_noise_error(ctx, error):
+  print(error)
+  await ctx.channel.send('error!')
+
+
+@client.command(name='update-busy')
+async def update_busy(ctx, building, number, val):
+  # check if the location exists
+  location = f'{building.lower()} {number}'
+  if location not in LOCATIONS:
+    await ctx.channel.send(f'Location {location} not found!')
+
+  # update the location's noise level
+  LOCATIONS[location] = [LOCATIONS[location][0], val]
+
+
+@update_busy.error
+async def update_busy_error(ctx, error):
+  await ctx.channel.send('error!')
+
 @client.command(name='list-info',
                 help='Lists noise and busy-ness levels of all study locations',
                 brief='Lists noise and busy-ness levels of all study locations')
@@ -137,11 +170,11 @@ async def list_info(ctx):
     info_table = '| Location | Noise | Busy-ness |\n' \
                  + '|----------|-------|-----------|\n'
 
-    for location in STUDY_LOCATIONS:
+    for location in LOCATIONS:
         location_string = location
         location_length = len(location_string)
-        noise_level = str(STUDY_LOCATIONS[location][0])
-        busyness_level = str(STUDY_LOCATIONS[location][1])
+        noise_level = str(LOCATIONS[location][0])
+        busyness_level = str(LOCATIONS[location][1])
 
         # Add padding to location string
         while location_length < 8:
