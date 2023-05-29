@@ -29,11 +29,11 @@ To host WIP Bot, follow the following steps:
 
 ### `/update-noise`
 - Updates the noise level for a location.
-- Usage: `update-noise building number value` where `building` a building name and `number` is a room number for a location that exists, and `value` is the current noise level (between 1 and 5, inclusive) of that location.
+- Usage: `update-noise building number value` where `building` a building name and `number` is a room number for a location that exists, and `value` is the current noise level (between 1 (lowest) and 5 (highest), inclusive) of that location.
 
 ### `/update-busy`
 - Updates the busy-ness level for a location.
-- Usage: `update-busy building number value` where `building` a building name and `number` is a room number for a location that exists, and `value` is the current \"busy-ness\" level (between 1 and 5, inclusive) of that location.
+- Usage: `update-busy building number value` where `building` a building name and `number` is a room number for a location that exists, and `value` is the current \"busy-ness\" level (between 1 (lowest) and 5 (highest), inclusive) of that location.
 
 ### `/list-people`
 - Given a building code and room number, lists all people at that location
