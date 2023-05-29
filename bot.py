@@ -256,7 +256,7 @@ async def leave(ctx, building, number):
                         description=':wave: See you next time!',
                         color=0x57F287)
   await ctx.channel.send(embed=embed)
-  await channel.send(f'{ctx.author.name} has left!')
+  await channel.send(f'{ctx.author.nick} has left!')
 
 
 @leave.error
